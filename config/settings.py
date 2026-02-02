@@ -136,6 +136,7 @@ STATIC_URL = 'static/'
 
 # CORS Settings (allow Next.js frontend)
 CORS_ALLOWED_ORIGINS = [
+    "https://khaizen-frontend.vercel.app",
     "http://localhost:3001",
     "http://localhost:3000",
 ]
