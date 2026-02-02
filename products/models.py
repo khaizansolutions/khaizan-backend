@@ -68,6 +68,7 @@ class Product(models.Model):
     # Description & Details
     description = models.TextField(help_text="Main product description")
     features = models.JSONField(
+        null=True,
         default=list, 
         blank=True,
         help_text='List of features: ["Feature 1", "Feature 2"]'
