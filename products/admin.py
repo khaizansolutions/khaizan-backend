@@ -1,18 +1,12 @@
 # Backend: products/admin.py
 
 from django.contrib import admin
-from .models import Category, Product, ProductImage, Review
+from .models import Category, Product, ProductImage
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
     fields = ('image', 'alt_text', 'order')
-
-class ReviewInline(admin.TabularInline):
-    model = Review
-    extra = 0
-    fields = ('user', 'rating', 'comment', 'created_at')
-    readonly_fields = ('created_at',)
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -25,7 +19,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ('category', 'in_stock', 'is_active', 'created_at')
     search_fields = ('name', 'sku', 'description')
     prepopulated_fields = {'slug': ('name',)}
-    inlines = [ProductImageInline, ReviewInline]
+    inlines = [ProductImageInline]
     
     fieldsets = (
         ('Basic Information', {
@@ -39,14 +33,10 @@ class ProductAdmin(admin.ModelAdmin):
         }),
         ('Description', {
             'fields': ('description', 'main_image'),
-            'description': 'Add detailed product description and main image'
         }),
         ('Features & Specifications', {
             'fields': ('features', 'specifications'),
-            'description': '''
-                <strong>Features:</strong> Enter as JSON list: ["Durable material", "Easy to use", "Long lasting"]<br>
-                <strong>Specifications:</strong> Enter as JSON object: {"Weight": "500g", "Color": "Blue", "Material": "Plastic"}
-            '''
+            'description': '<strong>Features:</strong> ["Feature 1", "Feature 2"]<br><strong>Specifications:</strong> {"Key": "Value"}'
         }),
         ('Ratings & Status', {
             'fields': ('rating', 'reviews', 'is_active')
@@ -55,5 +45,5 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ('product', 'alt_text', 'order', 'uploaded_at')
+    list_display = ('product', 'alt_text', 'order')
     list_filter = ('product',)
