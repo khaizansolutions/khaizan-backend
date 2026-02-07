@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from .models import Category, Product, ProductImage
+from .forms import ProductAdminForm
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -15,6 +16,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    form = ProductAdminForm
     list_display = ('name', 'sku', 'category', 'price', 'stock_count', 'in_stock', 'is_active')
     list_filter = ('category', 'in_stock', 'is_active', 'created_at')
     search_fields = ('name', 'sku', 'description')
@@ -34,9 +36,13 @@ class ProductAdmin(admin.ModelAdmin):
         ('Description', {
             'fields': ('description', 'main_image'),
         }),
-        ('Features & Specifications', {
-            'fields': ('features', 'specifications'),
-            'description': '<strong>Features:</strong> ["Feature 1", "Feature 2"]<br><strong>Specifications:</strong> {"Key": "Value"}'
+        ('Features', {
+            'fields': ('feature_1', 'feature_2', 'feature_3', 'feature_4', 'feature_5'),
+            'description': 'Enter each feature in a separate field'
+        }),
+        ('Specifications', {
+            'fields': ('specifications_text',),
+            'description': 'Enter each specification on a new line: Key: Value'
         }),
         ('Ratings & Status', {
             'fields': ('rating', 'reviews', 'is_active')
