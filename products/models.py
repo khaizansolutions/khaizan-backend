@@ -3,11 +3,11 @@ from django.utils.text import slugify
 
 
 class Category(models.Model):
-    """Product Categories like Office Supplies, Technology, etc."""
+    """Main Product Categories like Office Supplies, Technology, etc."""
     name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(unique=True, blank=True)
     icon = models.CharField(
-        max_length=50, 
+        max_length=50,
         blank=True,
         help_text="Icon name from lucide-react (e.g., 'Package', 'Printer')"
     )
@@ -15,44 +15,79 @@ class Category(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         verbose_name_plural = "Categories"
         ordering = ['name']
-    
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
-    
+
     def __str__(self):
         return self.name
 
 
+class Subcategory(models.Model):
+    """Subcategories under main categories (e.g., Pens, Calculators under Stationery)"""
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(blank=True, max_length=250)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name='subcategories',
+        help_text="Parent category"
+    )
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Icon name from lucide-react"
+    )
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Subcategories"
+        ordering = ['category__name', 'name']
+        unique_together = ['category', 'name']  # Same subcategory name allowed under different categories
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.category.name} → {self.name}"
+
+
 class Product(models.Model):
     """Main Product Model"""
-    
+
     # Basic Information
     name = models.CharField(max_length=300)
     slug = models.SlugField(unique=True, blank=True, max_length=350)
     sku = models.CharField(max_length=100, unique=True, help_text="Stock Keeping Unit")
-    category = models.ForeignKey(
-        Category, 
-        on_delete=models.PROTECT, 
-        related_name='products'
+    subcategory = models.ForeignKey(
+        Subcategory,
+        on_delete=models.PROTECT,
+        related_name='products',
+        help_text="Product subcategory"
     )
     brand = models.CharField(max_length=200)
-    
+
     # Pricing
     price = models.DecimalField(
-        max_digits=10, 
+        max_digits=10,
         decimal_places=2,
         help_text="Current selling price in AED"
     )
     original_price = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        null=True, 
+        max_digits=10,
+        decimal_places=2,
+        null=True,
         blank=True,
         help_text="Original price before discount"
     )
@@ -60,63 +95,68 @@ class Product(models.Model):
         default=0,
         help_text="Discount percentage (0-100)"
     )
-    
+
     # Inventory
     stock_count = models.IntegerField(default=0, help_text="Available quantity")
     in_stock = models.BooleanField(default=True)
-    
+
     # Description & Details
     description = models.TextField(help_text="Main product description")
     features = models.JSONField(
         null=True,
-        default=list, 
+        default=list,
         blank=True,
         help_text='List of features: ["Feature 1", "Feature 2"]'
     )
     specifications = models.JSONField(
-        default=dict, 
+        default=dict,
         blank=True,
         help_text='Specifications: {"Weight": "1kg", "Color": "Black"}'
     )
-    
+
     # Ratings & Reviews
     rating = models.DecimalField(
-        max_digits=3, 
-        decimal_places=1, 
+        max_digits=3,
+        decimal_places=1,
         default=4.5,
         help_text="Average rating (0.0 - 5.0)"
     )
     reviews = models.IntegerField(default=0, help_text="Number of reviews")
-    
+
     # Main Product Image
     main_image = models.ImageField(
-        upload_to='products/%Y/%m/', 
-        blank=True, 
+        upload_to='products/%Y/%m/',
+        blank=True,
         null=True,
         help_text="Main product image"
     )
-    
+
     # Status Flags
     is_active = models.BooleanField(default=True, help_text="Is product visible?")
     is_featured = models.BooleanField(default=False, help_text="Show on homepage?")
-    
+
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         ordering = ['-created_at']
         verbose_name = "Product"
         verbose_name_plural = "Products"
-    
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
-    
+
     def __str__(self):
         return self.name
-    
+
+    @property
+    def category(self):
+        """Get parent category through subcategory"""
+        return self.subcategory.category if self.subcategory else None
+
     @property
     def final_price(self):
         """Calculate price after discount"""
@@ -128,8 +168,8 @@ class Product(models.Model):
 class ProductImage(models.Model):
     """Additional product images"""
     product = models.ForeignKey(
-        Product, 
-        on_delete=models.CASCADE, 
+        Product,
+        on_delete=models.CASCADE,
         related_name='images'
     )
     image = models.ImageField(upload_to='products/%Y/%m/')
@@ -137,11 +177,11 @@ class ProductImage(models.Model):
     is_primary = models.BooleanField(default=False)
     order = models.IntegerField(default=0, help_text="Display order")
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ['order', 'created_at']
         verbose_name = "Product Image"
         verbose_name_plural = "Product Images"
-    
+
     def __str__(self):
         return f"{self.product.name} - Image {self.order}"
