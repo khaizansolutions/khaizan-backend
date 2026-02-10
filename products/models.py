@@ -13,12 +13,23 @@ class Category(models.Model):
     )
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
+
+    # NEW: Navbar control fields
+    show_in_navbar = models.BooleanField(
+        default=False,
+        help_text="Display this category in the navigation bar"
+    )
+    navbar_order = models.IntegerField(
+        default=0,
+        help_text="Display order in navbar (1, 2, 3, etc.). 0 = not shown"
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name_plural = "Categories"
-        ordering = ['name']
+        ordering = ['navbar_order', 'name']
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -66,6 +77,13 @@ class Subcategory(models.Model):
 class Product(models.Model):
     """Main Product Model"""
 
+    # NEW: Product type choices
+    PRODUCT_TYPE_CHOICES = [
+        ('new', 'New Product'),
+        ('refurbished', 'Refurbished Product'),
+        ('rental', 'Rental Product'),
+    ]
+
     # Basic Information
     name = models.CharField(max_length=300)
     slug = models.SlugField(unique=True, blank=True, max_length=350)
@@ -77,6 +95,14 @@ class Product(models.Model):
         help_text="Product subcategory"
     )
     brand = models.CharField(max_length=200)
+
+    # NEW: Product Type
+    product_type = models.CharField(
+        max_length=20,
+        choices=PRODUCT_TYPE_CHOICES,
+        default='new',
+        help_text="Select product type: New, Refurbished, or Rental"
+    )
 
     # Pricing
     price = models.DecimalField(
@@ -163,6 +189,11 @@ class Product(models.Model):
         if self.original_price and self.discount > 0:
             return self.price
         return self.price
+
+    @property
+    def product_type_display(self):
+        """Get human-readable product type"""
+        return dict(self.PRODUCT_TYPE_CHOICES).get(self.product_type, 'New Product')
 
 
 class ProductImage(models.Model):
