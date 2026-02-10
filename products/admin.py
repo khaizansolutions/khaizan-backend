@@ -13,14 +13,14 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'subcategory_count', 'is_active', 'description')
+    list_display = ('name', 'slug', 'subcategory_count', 'is_active')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name', 'description')
     list_filter = ('is_active', 'created_at')
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'slug', 'description')
+            'fields': ('name', 'slug', 'icon', 'description')
         }),
         ('Status', {
             'fields': ('is_active',)
@@ -29,9 +29,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
     def subcategory_count(self, obj):
         return obj.subcategories.count()
-
     subcategory_count.short_description = 'Subcategories'
-    subcategory_count.admin_order_field = 'subcategories__count'
 
 
 @admin.register(Subcategory)
@@ -43,7 +41,7 @@ class SubcategoryAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'slug', 'category', 'description')
+            'fields': ('name', 'slug', 'category', 'icon', 'description')
         }),
         ('Status', {
             'fields': ('is_active',)
@@ -52,15 +50,13 @@ class SubcategoryAdmin(admin.ModelAdmin):
 
     def product_count(self, obj):
         return obj.products.count()
-
     product_count.short_description = 'Products'
-    product_count.admin_order_field = 'products__count'
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
-    list_display = ('name', 'sku', 'get_category', 'subcategory', 'price', 'stock_count', 'in_stock', 'is_active')
+    list_display = ('name', 'sku', 'get_category', 'subcategory', 'brand', 'price', 'stock_count', 'in_stock', 'is_active')
     list_filter = ('subcategory__category', 'subcategory', 'in_stock', 'is_active', 'created_at')
     search_fields = ('name', 'sku', 'description', 'brand', 'subcategory__name', 'subcategory__category__name')
     prepopulated_fields = {'slug': ('name',)}
@@ -88,13 +84,12 @@ class ProductAdmin(admin.ModelAdmin):
             'description': 'Enter each specification on a new line: Key: Value'
         }),
         ('Ratings & Status', {
-            'fields': ('rating', 'reviews', 'is_active')
+            'fields': ('rating', 'reviews', 'is_active', 'is_featured')
         }),
     )
 
     def get_category(self, obj):
         return obj.subcategory.category.name if obj.subcategory else '-'
-
     get_category.short_description = 'Category'
     get_category.admin_order_field = 'subcategory__category__name'
 
