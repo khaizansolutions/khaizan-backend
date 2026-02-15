@@ -1,5 +1,3 @@
-# Backend: products/serializers.py
-
 from rest_framework import serializers
 from .models import Category, Subcategory, Product, ProductImage
 
@@ -25,7 +23,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'icon', 'description',
             'subcategories', 'product_count',
-            'show_in_navbar', 'navbar_order'  # NEW: Navbar fields
+            'show_in_navbar', 'navbar_order'
         ]
 
     def get_product_count(self, obj):
@@ -43,34 +41,68 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
+    """Serializer for Product List - minimal fields for performance"""
     category_name = serializers.CharField(source='subcategory.category.name', read_only=True)
     subcategory_name = serializers.CharField(source='subcategory.name', read_only=True)
-    product_type_display = serializers.CharField(read_only=True)  # NEW: Human-readable product type
+    product_type_display = serializers.CharField(read_only=True)
+    final_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    is_on_sale = serializers.BooleanField(read_only=True)
+    stock_status = serializers.CharField(read_only=True)
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'slug', 'sku', 'category_name', 'subcategory_name',
-            'brand', 'product_type', 'product_type_display',  # NEW: Added product_type fields
-            'price', 'original_price', 'discount', 'main_image',
-            'stock_count', 'in_stock', 'rating', 'reviews', 'is_featured'
+            'brand', 'product_type', 'product_type_display',
+            'price', 'original_price', 'discount', 'final_price', 'is_on_sale',
+            'main_image', 'stock_count', 'stock_status', 'in_stock',
+            'rating', 'reviews', 'is_featured'
         ]
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
+    """Serializer for Product Detail - all fields"""
     category_name = serializers.CharField(source='subcategory.category.name', read_only=True)
     subcategory_name = serializers.CharField(source='subcategory.name', read_only=True)
-    subcategory = SubcategorySerializer(read_only=True)  # NEW: Full subcategory details
+    subcategory = SubcategorySerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
-    product_type_display = serializers.CharField(read_only=True)  # NEW: Human-readable product type
+    product_type_display = serializers.CharField(read_only=True)
+    final_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    discount_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    is_on_sale = serializers.BooleanField(read_only=True)
+    stock_status = serializers.CharField(read_only=True)
 
     class Meta:
         model = Product
         fields = [
+            # Basic Info
             'id', 'name', 'slug', 'sku', 'category_name', 'subcategory_name',
-            'subcategory',  # NEW: Full subcategory object with category info
-            'brand', 'product_type', 'product_type_display',  # NEW: Added product_type fields
-            'price', 'original_price', 'discount', 'main_image',
-            'images', 'stock_count', 'in_stock', 'description', 'features',
-            'specifications', 'rating', 'reviews', 'is_featured', 'created_at'
+            'subcategory', 'brand', 'product_type', 'product_type_display',
+
+            # Pricing
+            'price', 'original_price', 'discount', 'final_price', 'discount_amount', 'is_on_sale',
+
+            # Rental Pricing (NEW)
+            'rental_price_daily', 'rental_price_weekly', 'rental_price_monthly', 'min_rental_period',
+
+            # Images
+            'main_image', 'images',
+
+            # Inventory
+            'stock_count', 'stock_status', 'in_stock',
+
+            # Description
+            'description', 'features', 'specifications',
+
+            # Product Details (NEW)
+            'weight', 'warranty_months', 'condition',
+
+            # Ratings
+            'rating', 'reviews',
+
+            # SEO (NEW)
+            'meta_title', 'meta_description',
+
+            # Status
+            'is_featured', 'created_at'
         ]

@@ -1,0 +1,221 @@
+/* Static file: products/static/admin/css/product_admin.css */
+
+/* Product Type Radio Buttons Styling */
+.field-product_type .radiolist {
+    display: flex;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.field-product_type .radiolist label {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.field-product_type .radiolist label:hover {
+    transform: translateY(-2px);
+}
+
+/* Conditional Sections Styling */
+.rental-section,
+.refurbished-section {
+    border-left: 4px solid #3b82f6;
+    padding-left: 15px;
+    margin: 20px 0;
+    transition: all 0.3s ease;
+}
+
+.refurbished-section {
+    border-left-color: #f59e0b;
+}
+
+.rental-section h2,
+.refurbished-section h2 {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+/* Field Groups */
+.form-row {
+    transition: all 0.3s ease;
+}
+
+/* Rental Fields Highlight */
+.rental-field {
+    background-color: #eff6ff;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Refurbished Fields Highlight */
+.refurbished-field {
+    background-color: #fef3c7;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Product Type Badge in List View */
+.product-type-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Stock Status Styling */
+.stock-status {
+    font-weight: 600;
+}
+
+/* Featured Badge */
+.featured-badge {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+/* Thumbnail Styling */
+.thumbnail-preview {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.thumbnail-preview:hover {
+    transform: scale(1.1);
+}
+
+/* Form Section Headers */
+.module h2 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px 8px 0 0;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Collapsed Sections */
+.collapse h2 {
+    background: #f9fafb;
+    color: #374151;
+    cursor: pointer;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.collapse h2:hover {
+    background: #f3f4f6;
+}
+
+/* Help Text Styling */
+.form-row .help {
+    display: block;
+    margin-top: 5px;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Required Fields Indicator */
+.required label:after {
+    content: " *";
+    color: #ef4444;
+    font-weight: bold;
+}
+
+/* Inline Model Styling */
+.inline-group {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+    background: #f9fafb;
+    margin: 20px 0;
+}
+
+.inline-group h2 {
+    background: transparent;
+    color: #374151;
+    padding: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+/* Tabular Inline Styling */
+.tabular tbody tr {
+    transition: background-color 0.2s;
+}
+
+.tabular tbody tr:hover {
+    background-color: #f3f4f6;
+}
+
+/* Action Buttons */
+.actions select,
+.actions button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* List View Enhancements */
+#changelist .results {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#changelist .results thead th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+#changelist .results tbody tr:hover {
+    background-color: #f3f4f6;
+}
+
+/* Save Buttons */
+.submit-row {
+    padding: 15px 20px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.submit-row input[type="submit"] {
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.submit-row input[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .field-product_type .radiolist {
+        flex-direction: column;
+    }
+}
+
+/* Animation for field transitions */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-row {
+    animation: slideIn 0.3s ease;
+}
