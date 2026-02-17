@@ -5,20 +5,14 @@ Django settings for config project.
 from pathlib import Path
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# SECURITY WARNING: keep the secret key used in production secret!
+# ── Security ──────────────────────────────────────────────
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-b)%c!k0d4w902hwi_k0rdy-2ns-kad88&3dse9y3hmxkp8mfh&')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-
 ALLOWED_HOSTS = ['*']
 
-# Application definition
-
+# ── Apps ──────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -26,19 +20,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Third party
     'rest_framework',
     'corsheaders',
     'django_filters',
-    'cloudinary_storage',  # Must be before 'cloudinary'
+    'cloudinary_storage',
     'cloudinary',
-
-    # Local apps
     'products',
     'quotes',
 ]
 
+# ── Middleware ─────────────────────────────────────────────
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -52,6 +43,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 TEMPLATES = [
     {
@@ -68,24 +60,24 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-
-# Database
+# ── Database ───────────────────────────────────────────────
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'neondb',
-        'USER': 'neondb_owner',
-        'PASSWORD': 'npg_9Mbgd0vixpta',
-        'HOST': 'ep-falling-river-a1s9mv5j-pooler.ap-southeast-1.aws.neon.tech',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME', 'neondb'),
+        'USER': os.environ.get('DB_USER', 'neondb_owner'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'ep-falling-river-a1s9mv5j-pooler.ap-southeast-1.aws.neon.tech'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
         'OPTIONS': {
             'sslmode': 'require',
         },
+        # ⭐ Connection pooling — reuse DB connections instead of opening new ones
+        'CONN_MAX_AGE': 60,
     }
 }
 
-# Password validation
+# ── Auth ───────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -93,13 +85,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
+# ── Internationalisation ───────────────────────────────────
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Dubai'
 USE_I18N = True
 USE_TZ = True
 
-# CORS Settings
+# ── CORS ───────────────────────────────────────────────────
 CORS_ALLOWED_ORIGINS = [
     "https://khaizen-frontend.vercel.app",
     "https://www.khaizansolution.com",
@@ -108,42 +100,45 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-# REST Framework
+# ── REST Framework ─────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 15,
-    'PAGE_SIZE_QUERY_PARAM': 'page_size',  # ⭐ Allows ?page_size=X in URL
-    'MAX_PAGE_SIZE': 1000,  # ⭐ Maximum allowed page_size
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'PAGE_SIZE': 20,                          # ⭐ Reduced from 15 — better default
+    'PAGE_SIZE_QUERY_PARAM': 'page_size',
+    'MAX_PAGE_SIZE': 100,                     # ⭐ Hard cap — was 1000, killed Render
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
+    # ⭐ Cache responses for 60s — massive speed boost
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
 }
 
-# Static files (CSS, JavaScript, Images)
+# ── Static files ───────────────────────────────────────────
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Cloudinary Configuration for Media Files
+# ── Cloudinary ─────────────────────────────────────────────
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dfou5jsq4',
-    'API_KEY': '676198389127474',
-    'API_SECRET': '2Qr8hrT7z6zPPeWtqqOIPWIF0UU',
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dfou5jsq4'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
 }
 
 cloudinary.config(
-    cloud_name='dfou5jsq4',
-    api_key='676198389127474',
-    api_secret='2Qr8hrT7z6zPPeWtqqOIPWIF0UU',
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME', 'dfou5jsq4'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY', ''),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET', ''),
     secure=True
 )
 
-# Use Cloudinary for media file storage
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-# Media URL (Cloudinary will provide actual URLs like https://res.cloudinary.com/...)
 MEDIA_URL = '/media/'
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
