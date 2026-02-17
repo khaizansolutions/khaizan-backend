@@ -1,4 +1,5 @@
 from rest_framework import serializers
+import cloudinary
 from .models import Category, Subcategory, Product, ProductImage
 
 
@@ -27,7 +28,6 @@ class CategorySerializer(serializers.ModelSerializer):
         ]
 
     def get_product_count(self, obj):
-        # Count all products across all subcategories
         total = 0
         for subcategory in obj.subcategories.all():
             total += subcategory.products.filter(is_active=True).count()
@@ -35,9 +35,17 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    # ⭐ FIX: Convert CloudinaryField to full URL
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = ProductImage
         fields = ['id', 'image', 'alt_text', 'is_primary', 'order']
+
+    def get_image(self, obj):
+        if obj.image:
+            return cloudinary.CloudinaryImage(str(obj.image)).build_url()
+        return None
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -48,6 +56,8 @@ class ProductListSerializer(serializers.ModelSerializer):
     final_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     is_on_sale = serializers.BooleanField(read_only=True)
     stock_status = serializers.CharField(read_only=True)
+    # ⭐ FIX: Convert CloudinaryField to full URL
+    main_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -58,6 +68,11 @@ class ProductListSerializer(serializers.ModelSerializer):
             'main_image', 'stock_count', 'stock_status', 'in_stock',
             'rating', 'reviews', 'is_featured'
         ]
+
+    def get_main_image(self, obj):
+        if obj.main_image:
+            return cloudinary.CloudinaryImage(str(obj.main_image)).build_url()
+        return None
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -71,6 +86,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     discount_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     is_on_sale = serializers.BooleanField(read_only=True)
     stock_status = serializers.CharField(read_only=True)
+    # ⭐ FIX: Convert CloudinaryField to full URL
+    main_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -82,7 +99,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             # Pricing
             'price', 'original_price', 'discount', 'final_price', 'discount_amount', 'is_on_sale',
 
-            # Rental Pricing (NEW)
+            # Rental Pricing
             'rental_price_daily', 'rental_price_weekly', 'rental_price_monthly', 'min_rental_period',
 
             # Images
@@ -94,15 +111,20 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             # Description
             'description', 'features', 'specifications',
 
-            # Product Details (NEW)
+            # Product Details
             'weight', 'warranty_months', 'condition',
 
             # Ratings
             'rating', 'reviews',
 
-            # SEO (NEW)
+            # SEO
             'meta_title', 'meta_description',
 
             # Status
             'is_featured', 'created_at'
         ]
+
+    def get_main_image(self, obj):
+        if obj.main_image:
+            return cloudinary.CloudinaryImage(str(obj.main_image)).build_url()
+        return None
