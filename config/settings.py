@@ -14,6 +14,7 @@ ALLOWED_HOSTS = ['*']
 
 # ── Apps ──────────────────────────────────────────────────
 INSTALLED_APPS = [
+    'jazzmin',  # ✅ must be first
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -28,6 +29,40 @@ INSTALLED_APPS = [
     'products',
     'quotes',
 ]
+
+# ── Jazzmin ────────────────────────────────────────────────
+JAZZMIN_SETTINGS = {
+    "site_title": "Khaizan Admin",
+    "site_header": "Khaizan Solutions",
+    "site_brand": "Khaizan Solutions",
+    "welcome_sign": "Welcome to Khaizan Solutions Admin",
+    "copyright": "Khaizan Solutions Dubai",
+    "search_model": ["products.Product"],
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index"},
+        {"name": "View Site", "url": "https://www.khaizansolution.com", "new_window": True},
+    ],
+    "icons": {
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "products.Product": "fas fa-box",
+        "products.Category": "fas fa-tags",
+        "quotes.Quote": "fas fa-file-invoice",
+    },
+    "default_icon_parents": "fas fa-folder",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": True,
+    "show_ui_builder": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "brand_colour": "navbar-danger",
+    "accent": "accent-danger",
+    "navbar": "navbar-dark",
+    "navbar_fixed": True,
+    "sidebar": "sidebar-dark-danger",
+    "sidebar_fixed": True,
+}
 
 # ── Middleware ─────────────────────────────────────────────
 MIDDLEWARE = [
