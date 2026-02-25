@@ -4,6 +4,7 @@ Django settings for config project.
 
 from pathlib import Path
 import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -95,21 +96,13 @@ TEMPLATES = [
     },
 ]
 
-# ── Database ───────────────────────────────────────────────
+# ── Database — uses DATABASE_URL from Render environment ───
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'neondb'),
-        'USER': os.environ.get('DB_USER', 'neondb_owner'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST': os.environ.get('DB_HOST', 'ep-falling-river-a1s9mv5j-pooler.ap-southeast-1.aws.neon.tech'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-        # ⭐ Connection pooling — reuse DB connections instead of opening new ones
-        'CONN_MAX_AGE': 60,
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=60,
+        ssl_require=True,
+    )
 }
 
 # ── Auth ───────────────────────────────────────────────────
@@ -138,13 +131,12 @@ CORS_ALLOWED_ORIGINS = [
 # ── REST Framework ─────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,                          # ⭐ Reduced from 15 — better default
+    'PAGE_SIZE': 20,
     'PAGE_SIZE_QUERY_PARAM': 'page_size',
-    'MAX_PAGE_SIZE': 100,                     # ⭐ Hard cap — was 1000, killed Render
+    'MAX_PAGE_SIZE': 100,
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
-    # ⭐ Cache responses for 60s — massive speed boost
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
