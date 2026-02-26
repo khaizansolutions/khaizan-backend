@@ -8,14 +8,11 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ── Security ──────────────────────────────────────────────
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-b)%c!k0d4w902hwi_k0rdy-2ns-kad88&3dse9y3hmxkp8mfh&')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 
-# ── Apps ──────────────────────────────────────────────────
 INSTALLED_APPS = [
-    'jazzmin',  # ✅ must be first
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -31,41 +28,6 @@ INSTALLED_APPS = [
     'quotes',
 ]
 
-# ── Jazzmin ────────────────────────────────────────────────
-JAZZMIN_SETTINGS = {
-    "site_title": "Khaizan Admin",
-    "site_header": "Khaizan Solutions",
-    "site_brand": "Khaizan Solutions",
-    "welcome_sign": "Welcome to Khaizan Solutions Admin",
-    "copyright": "Khaizan Solutions Dubai",
-    "search_model": ["products.Product"],
-    "topmenu_links": [
-        {"name": "Home", "url": "admin:index"},
-        {"name": "View Site", "url": "https://www.khaizansolution.com", "new_window": True},
-    ],
-    "icons": {
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-        "products.Product": "fas fa-box",
-        "products.Category": "fas fa-tags",
-        "quotes.Quote": "fas fa-file-invoice",
-    },
-    "default_icon_parents": "fas fa-folder",
-    "default_icon_children": "fas fa-circle",
-    "related_modal_active": True,
-    "show_ui_builder": False,
-}
-
-JAZZMIN_UI_TWEAKS = {
-    "brand_colour": "navbar-danger",
-    "accent": "accent-danger",
-    "navbar": "navbar-dark",
-    "navbar_fixed": True,
-    "sidebar": "sidebar-dark-danger",
-    "sidebar_fixed": True,
-}
-
-# ── Middleware ─────────────────────────────────────────────
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -96,7 +58,6 @@ TEMPLATES = [
     },
 ]
 
-# ── Database — uses DATABASE_URL from Render environment ───
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL'),
@@ -105,7 +66,6 @@ DATABASES = {
     )
 }
 
-# ── Auth ───────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -113,13 +73,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ── Internationalisation ───────────────────────────────────
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Dubai'
 USE_I18N = True
 USE_TZ = True
 
-# ── CORS ───────────────────────────────────────────────────
 CORS_ALLOWED_ORIGINS = [
     "https://khaizen-frontend.vercel.app",
     "https://www.khaizansolution.com",
@@ -128,7 +86,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-# ── REST Framework ─────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
@@ -142,12 +99,10 @@ REST_FRAMEWORK = {
     ],
 }
 
-# ── Static files ───────────────────────────────────────────
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ── Cloudinary ─────────────────────────────────────────────
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
